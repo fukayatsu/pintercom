@@ -9,7 +9,7 @@ require 'dotenv'
 
 Dotenv.load
 
-Process.daemon
+# Process.daemon
 
 class Notifier
   def initialize
