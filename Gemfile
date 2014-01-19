@@ -5,5 +5,5 @@ gem 'faraday'
 gem 'nokogiri'
 gem 'dotenv'
 gem 'hipchat'
-gem 'pry'
+#gem 'pry'
 

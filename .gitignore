@@ -2,4 +2,5 @@
 .env
 tmp/*
 !tmp/.keep
+*.swp
 
