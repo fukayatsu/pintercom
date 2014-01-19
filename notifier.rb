@@ -36,18 +36,18 @@ class Notifier
   def watch_pin
     @notifier = self
     PiPiper.after pin: 24, goes: :down  do |pin|
-      @led.on
-      beep(0.1)
+      @led.on; beep(0.1); @led.off
       puts "[#{Time.now}] button pressed"
 
       `cd /home/pi/pintercom; raspistill -t 1 -o tmp/pic.jpg -w 1280 -h 800 -q 80`
 
       beep(0.1); sleep 0.1; beep(0.1)
+
       @hipchat['entrance'].send('pintercom', "@here Someone has come!", message_format: 'text')
       image_url = upload('tmp/pic.jpg')
       @hipchat['entrance'].send('pintercom', image_url, message_format: 'text')
 
-      @led.off
+      @led.on; sleep(0.1); @led.off
     end
     `echo high > /sys/class/gpio/gpio24/direction` # pull-up
   end
