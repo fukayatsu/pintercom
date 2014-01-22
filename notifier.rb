@@ -2,7 +2,7 @@
 
 require 'hipchat'
 require 'pi_piper'
-require 'nokogiri'
+require 'json'
 require 'faraday'
 require 'dotenv'
 #require 'pry'
@@ -20,7 +20,7 @@ class Notifier
   end
 
   def http
-    Faraday.new(url: "https://#{ENV['HIPCHAT_HOST']}") do |f|
+    Faraday.new(url: ENV['HEROCKER_URL']) do |f|
       f.request :multipart
       f.request :url_encoded
       f.adapter :net_http 
@@ -62,22 +62,16 @@ class Notifier
 
   def upload(image_file)
     payload = {
-      user_id:  ENV['HIPCHAT_USER_ID'],
-      group_id: ENV['HIPCHAT_GROUP_ID'],
-      desc:     "taken at #{Time.now}",
-      jid:      ENV['HIPCHAT_JID'],
-      token:    ENV['HIPCHAT_CHAT_TOKEN'],
-      Filedata: Faraday::UploadIO.new(image_file, 'image/jpeg'),
+      file: Faraday::UploadIO.new(image_file, 'image/jpeg'),
+      upload_token: ENV['HEROCKER_UPLOAD_TOKEN'],
     }
-    res = @http.post '/api/upload_file', payload
+    res = @http.post '/images.json', payload
 
-    xml      = Nokogiri.parse(res.body)
-    filename = xml.xpath('response/filename').text
-    bucket   = xml.xpath('response/bucket').text
-    url      = "https://s3.amazonaws.com/#{bucket}/#{filename}"
+    image_url = JSON.parse(res.body)["image_url"]
+
   rescue => e
     p e.message
-    "file upload error"
+    p "file upload error"
   end
 end
 
